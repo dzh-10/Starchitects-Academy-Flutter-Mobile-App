@@ -1,0 +1,22 @@
+{
+  "auth": {
+    "academy_name": "أكاديمية ستاركتكتس",
+    "login_subtitle": "مرحباً بك مجدداً، سجل الدخول للمتابعة",
+    "email_hint": "البريد الإلكتروني",
+    "password_hint": "كلمة المرور",
+    "forgot_password": "هل نسيت كلمة المرور؟",
+    "login": "تسجيل الدخول",
+    "or": "أو",
+    "google_sign_in": "المتابعة باستخدام Google",
+    "no_account": "ليس لديك حساب؟",
+    "create_account": "إنشاء حساب جديد",
+    "register_subtitle": "أنشئ حساباً جديداً للبدء",
+    "name_hint": "الاسم الكامل",
+    "phone_hint": "رقم الهاتف (اختياري)",
+    "confirm_password_hint": "تأكيد كلمة المرور",
+    "accept_terms_prefix": "قرأت وأوافق على",
+    "terms_and_conditions": "الشروط والأحكام",
+    "register": "إنشاء حساب",
+    "have_account": "لديك حساب بالفعل؟"
+  }
+}

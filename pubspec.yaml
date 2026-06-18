@@ -1,0 +1,54 @@
+name: starchitects_app
+description: "Starchitects Academy - Premium Arabic E-Learning Student App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: any
+  hooks_riverpod: any
+  flutter_hooks: any
+  go_router: ^13.2.0
+  dio: ^5.4.3
+  retrofit: any
+  freezed_annotation: any
+  json_annotation: any
+  riverpod_annotation: any
+  flutter_secure_storage: ^9.0.0
+  hive_flutter: ^1.1.0
+  video_player: ^2.8.2
+  chewie: ^1.7.4
+  webview_flutter: ^4.7.0
+  firebase_core: ^2.30.1
+  firebase_messaging: ^14.9.1
+  flutter_local_notifications: ^17.1.2
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  flutter_animate: ^4.5.0
+  lottie: ^3.1.0
+  google_fonts: ^6.2.1
+  share_plus: ^9.0.0
+  intl: ^0.20.2
+  flutter_dotenv: ^6.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.9
+  freezed: any
+  json_serializable: any
+  retrofit_generator: any
+  riverpod_generator: any
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/.env

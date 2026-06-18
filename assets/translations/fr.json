@@ -1,0 +1,22 @@
+{
+  "auth": {
+    "academy_name": "Starchitects Academy",
+    "login_subtitle": "Heureux de vous revoir, connectez-vous",
+    "email_hint": "Adresse e-mail",
+    "password_hint": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "login": "Se connecter",
+    "or": "Ou",
+    "google_sign_in": "Continuer avec Google",
+    "no_account": "Vous n'avez pas de compte ?",
+    "create_account": "Créer un compte",
+    "register_subtitle": "Créez un nouveau compte pour commencer",
+    "name_hint": "Nom complet",
+    "phone_hint": "Numéro de téléphone (Optionnel)",
+    "confirm_password_hint": "Confirmer le mot de passe",
+    "accept_terms_prefix": "J'ai lu et j'accepte les",
+    "terms_and_conditions": "Conditions d'utilisation",
+    "register": "S'inscrire",
+    "have_account": "Vous avez déjà un compte ?"
+  }
+}
