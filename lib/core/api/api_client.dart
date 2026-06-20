@@ -6,6 +6,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:starchitects_app/core/api/api_exceptions.dart';
 import 'package:starchitects_app/core/storage/secure_storage.dart';
+import '../network/dio_client.dart';
 
 part 'api_client.g.dart';
 
@@ -13,75 +14,7 @@ part 'api_client.g.dart';
 /// and debug logging. Provided as a keepAlive Riverpod provider.
 @Riverpod(keepAlive: true)
 Dio apiClient(Ref ref) {
-  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8001/api';
-
-  final dio = Dio(
-    BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      sendTimeout: const Duration(seconds: 30),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    ),
-  );
-
-  // â”€â”€â”€ Auth Interceptor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  dio.interceptors.add(
-    InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final storage = ref.read(secureStorageServiceProvider.notifier);
-        final token = await storage.getToken();
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        handler.next(options);
-      },
-    ),
-  );
-
-  // â”€â”€â”€ Error Interceptor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  dio.interceptors.add(
-    InterceptorsWrapper(
-      onError: (error, handler) async {
-        final apiException = _mapDioException(error);
-
-        // On 401: clear stored token (auto-logout is handled by
-        // the auth state listener watching the token)
-        if (apiException is UnauthorizedException) {
-          final storage = ref.read(secureStorageServiceProvider.notifier);
-          await storage.deleteToken();
-        }
-
-        handler.reject(
-          DioException(
-            requestOptions: error.requestOptions,
-            response: error.response,
-            type: error.type,
-            error: apiException,
-          ),
-        );
-      },
-    ),
-  );
-
-  // â”€â”€â”€ Debug Logger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  if (kDebugMode) {
-    dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-      ),
-    );
-  }
-
-  return dio;
+  return ref.watch(dioProvider);
 }
 
 /// Maps DioException to our custom ApiException hierarchy

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/glass_card.dart';
 import '../domain/auth_provider.dart';
 import '../domain/auth_state.dart';
 
@@ -24,117 +25,102 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
-    try {
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
       await ref.read(authNotifierProvider.notifier).login(
-            _emailController.text.trim(),
+            _emailController.text,
             _passwordController.text,
           );
-    } catch (_) {}
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
-      if (next.status == AuthStatus.authenticated) {
-        context.go('/home');
-      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      next.whenOrNull(
+        data: (user) {
+          if (user != null) context.go('/home');
+        },
+        error: (error, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('فشل تسجيل الدخول: $error')),
+          );
+        },
+      );
     });
 
-    final authState = ref.watch(authNotifierProvider);
-    final isLoading = authState.isLoading;
+    final isLoading = ref.watch(authNotifierProvider).isLoading;
 
     return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Center(
-          child: SingleChildScrollView(
+      appBar: AppBar(title: const Text('تسجيل الدخول')),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: GlassCard(
             padding: const EdgeInsets.all(24.0),
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: AppColors.kGold, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'تسجيل الدخول',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayLarge
-                            ?.copyWith(color: AppColors.kGold),
-                      ),
-                      const SizedBox(height: 32),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'البريد الإلكتروني',
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'كلمة المرور',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? 'مطلوب' : null,
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : _login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.kGold,
-                          ),
-                          child: isLoading
-                              ? const CircularProgressIndicator(
-                                  color: AppColors.kBgPrimary)
-                              : const Text(
-                                  'تسجيل الدخول',
-                                  style: TextStyle(
-                                    color: AppColors.kBgPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () => context.push('/register'),
-                        child: const Text(
-                          'إنشاء حساب جديد',
-                          style: TextStyle(color: AppColors.kTextPrimary),
-                        ),
-                      ),
-                    ],
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'البريد الإلكتروني',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'مطلوب';
+                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                      if (!emailRegex.hasMatch(v.trim())) return 'بريد إلكتروني غير صالح';
+                      return null;
+                    },
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'كلمة المرور',
+                      prefixIcon: Icon(Icons.lock),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'مطلوب' : null,
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.kGold,
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                              color: AppColors.kBgPrimary)
+                          : const Text(
+                              'تسجيل الدخول',
+                              style: TextStyle(
+                                color: AppColors.kBgPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () => context.push('/register'),
+                    child: const Text(
+                      'إنشاء حساب جديد',
+                      style: TextStyle(color: AppColors.kTextPrimary),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

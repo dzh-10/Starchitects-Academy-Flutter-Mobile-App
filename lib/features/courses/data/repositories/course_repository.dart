@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:starchitects_app/core/api/api_client.dart';
@@ -12,7 +12,6 @@ class CourseRepository {
 
   CourseRepository(this._apiClient);
 
-  /// Fetch paginated list of courses with optional filters
   Future<List<CourseModel>> getCourses({
     String? category,
     String? search,
@@ -33,41 +32,56 @@ class CourseRepository {
       queryParameters: queryParams,
     );
 
-    final list = response.data as List<dynamic>;
+    final raw = response.data;
+    final list = raw is List
+        ? raw
+        : (raw is Map && raw['data'] is List)
+            ? raw['data'] as List<dynamic>
+            : <dynamic>[];
     return list
-        .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map<String, dynamic>>()
+        .map((e) => CourseModel.fromJson(e))
         .toList();
   }
 
-  /// Fetch detailed information for a single course
   Future<CourseModel> getCourseDetail(String id) async {
-    final response = await _apiClient.get('${ApiEndpoints.courses}/$id');
-    return CourseModel.fromJson(response.data as Map<String, dynamic>);
+    final response = await _apiClient.get('/');
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return CourseModel.fromJson(data);
+    }
+    throw Exception('Invalid response format');
   }
 
-  /// Fetch all lessons for a course
   Future<List<LessonModel>> getCourseLessons(String courseId) async {
     final response =
-        await _apiClient.get('${ApiEndpoints.courses}/$courseId/lessons');
-    final list = response.data as List<dynamic>;
+        await _apiClient.get('//lessons');
+    final raw = response.data;
+    final list = raw is List
+        ? raw
+        : (raw is Map && raw['data'] is List)
+            ? raw['data'] as List<dynamic>
+            : <dynamic>[];
     return list
-        .map((e) => LessonModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map<String, dynamic>>()
+        .map((e) => LessonModel.fromJson(e))
         .toList();
   }
 
-  /// Enroll the current student in a course
   Future<void> enrollCourse(String courseId) async {
-    await _apiClient.post('${ApiEndpoints.courses}/$courseId/enroll');
+    await _apiClient.post('//enroll');
   }
 
-  /// Get the video URL for a specific lesson
   Future<String> getLessonVideo(String lessonId) async {
     final response =
         await _apiClient.get(ApiEndpoints.lessonVideo(lessonId));
-    return (response.data as Map<String, dynamic>)['url'] as String;
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return data['url'] as String? ?? '';
+    }
+    return '';
   }
 
-  /// Update lesson watch progress
   Future<void> updateLessonProgress(
       String lessonId, double progressPercent) async {
     await _apiClient.post(
@@ -76,13 +90,18 @@ class CourseRepository {
     );
   }
 
-  /// Fetch reviews for a course
   Future<List<ReviewModel>> getCourseReviews(String courseId) async {
     final response =
-        await _apiClient.get('${ApiEndpoints.courses}/$courseId/reviews');
-    final list = response.data as List<dynamic>;
+        await _apiClient.get('//reviews');
+    final raw = response.data;
+    final list = raw is List
+        ? raw
+        : (raw is Map && raw['data'] is List)
+            ? raw['data'] as List<dynamic>
+            : <dynamic>[];
     return list
-        .map((e) => ReviewModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map<String, dynamic>>()
+        .map((e) => ReviewModel.fromJson(e))
         .toList();
   }
 }

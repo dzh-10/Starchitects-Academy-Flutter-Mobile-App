@@ -6,7 +6,7 @@ part of 'api_client.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$apiClientHash() => r'3be37ab0a7e43921ae855d7377432e7b2fbe4e88';
+String _$apiClientHash() => r'506e81edfc96b9b480d9f4edee15c5c6265d5107';
 
 /// Dio API client configured with auth interceptor, error mapping,
 /// and debug logging. Provided as a keepAlive Riverpod provider.

@@ -6,7 +6,7 @@ part of 'courses_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$courseDetailHash() => r'508f8d41447d628f1aa2b0d658f9acd44c91a6ed';
+String _$courseDetailHash() => r'94dcbc10e6c23a433698bf68c8176c219234f767';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -34,7 +34,7 @@ class _SystemHash {
 const courseDetailProvider = CourseDetailFamily();
 
 /// See also [courseDetail].
-class CourseDetailFamily extends Family<AsyncValue<Course>> {
+class CourseDetailFamily extends Family<AsyncValue<CourseModel>> {
   /// See also [courseDetail].
   const CourseDetailFamily();
 
@@ -72,7 +72,7 @@ class CourseDetailFamily extends Family<AsyncValue<Course>> {
 }
 
 /// See also [courseDetail].
-class CourseDetailProvider extends AutoDisposeFutureProvider<Course> {
+class CourseDetailProvider extends AutoDisposeFutureProvider<CourseModel> {
   /// See also [courseDetail].
   CourseDetailProvider(
     String slug,
@@ -107,7 +107,7 @@ class CourseDetailProvider extends AutoDisposeFutureProvider<Course> {
 
   @override
   Override overrideWith(
-    FutureOr<Course> Function(CourseDetailRef provider) create,
+    FutureOr<CourseModel> Function(CourseDetailRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -124,7 +124,7 @@ class CourseDetailProvider extends AutoDisposeFutureProvider<Course> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<Course> createElement() {
+  AutoDisposeFutureProviderElement<CourseModel> createElement() {
     return _CourseDetailProviderElement(this);
   }
 
@@ -142,36 +142,36 @@ class CourseDetailProvider extends AutoDisposeFutureProvider<Course> {
   }
 }
 
-mixin CourseDetailRef on AutoDisposeFutureProviderRef<Course> {
+mixin CourseDetailRef on AutoDisposeFutureProviderRef<CourseModel> {
   /// The parameter `slug` of this provider.
   String get slug;
 }
 
 class _CourseDetailProviderElement
-    extends AutoDisposeFutureProviderElement<Course> with CourseDetailRef {
+    extends AutoDisposeFutureProviderElement<CourseModel> with CourseDetailRef {
   _CourseDetailProviderElement(super.provider);
 
   @override
   String get slug => (origin as CourseDetailProvider).slug;
 }
 
-String _$courseLessonsHash() => r'6d9a81b481251d341b170993ee8d79abb6ba4805';
+String _$courseLessonsHash() => r'733ccbf5040dd0503a79591066bec4e23dcd5e7c';
 
 /// See also [courseLessons].
 @ProviderFor(courseLessons)
 const courseLessonsProvider = CourseLessonsFamily();
 
 /// See also [courseLessons].
-class CourseLessonsFamily extends Family<AsyncValue<List<Section>>> {
+class CourseLessonsFamily extends Family<AsyncValue<List<LessonModel>>> {
   /// See also [courseLessons].
   const CourseLessonsFamily();
 
   /// See also [courseLessons].
   CourseLessonsProvider call(
-    int courseId,
+    String slug,
   ) {
     return CourseLessonsProvider(
-      courseId,
+      slug,
     );
   }
 
@@ -180,7 +180,7 @@ class CourseLessonsFamily extends Family<AsyncValue<List<Section>>> {
     covariant CourseLessonsProvider provider,
   ) {
     return call(
-      provider.courseId,
+      provider.slug,
     );
   }
 
@@ -200,14 +200,15 @@ class CourseLessonsFamily extends Family<AsyncValue<List<Section>>> {
 }
 
 /// See also [courseLessons].
-class CourseLessonsProvider extends AutoDisposeFutureProvider<List<Section>> {
+class CourseLessonsProvider
+    extends AutoDisposeFutureProvider<List<LessonModel>> {
   /// See also [courseLessons].
   CourseLessonsProvider(
-    int courseId,
+    String slug,
   ) : this._internal(
           (ref) => courseLessons(
             ref as CourseLessonsRef,
-            courseId,
+            slug,
           ),
           from: courseLessonsProvider,
           name: r'courseLessonsProvider',
@@ -218,7 +219,7 @@ class CourseLessonsProvider extends AutoDisposeFutureProvider<List<Section>> {
           dependencies: CourseLessonsFamily._dependencies,
           allTransitiveDependencies:
               CourseLessonsFamily._allTransitiveDependencies,
-          courseId: courseId,
+          slug: slug,
         );
 
   CourseLessonsProvider._internal(
@@ -228,14 +229,14 @@ class CourseLessonsProvider extends AutoDisposeFutureProvider<List<Section>> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.courseId,
+    required this.slug,
   }) : super.internal();
 
-  final int courseId;
+  final String slug;
 
   @override
   Override overrideWith(
-    FutureOr<List<Section>> Function(CourseLessonsRef provider) create,
+    FutureOr<List<LessonModel>> Function(CourseLessonsRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -246,50 +247,50 @@ class CourseLessonsProvider extends AutoDisposeFutureProvider<List<Section>> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        courseId: courseId,
+        slug: slug,
       ),
     );
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<Section>> createElement() {
+  AutoDisposeFutureProviderElement<List<LessonModel>> createElement() {
     return _CourseLessonsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is CourseLessonsProvider && other.courseId == courseId;
+    return other is CourseLessonsProvider && other.slug == slug;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, courseId.hashCode);
+    hash = _SystemHash.combine(hash, slug.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
-mixin CourseLessonsRef on AutoDisposeFutureProviderRef<List<Section>> {
-  /// The parameter `courseId` of this provider.
-  int get courseId;
+mixin CourseLessonsRef on AutoDisposeFutureProviderRef<List<LessonModel>> {
+  /// The parameter `slug` of this provider.
+  String get slug;
 }
 
 class _CourseLessonsProviderElement
-    extends AutoDisposeFutureProviderElement<List<Section>>
+    extends AutoDisposeFutureProviderElement<List<LessonModel>>
     with CourseLessonsRef {
   _CourseLessonsProviderElement(super.provider);
 
   @override
-  int get courseId => (origin as CourseLessonsProvider).courseId;
+  String get slug => (origin as CourseLessonsProvider).slug;
 }
 
-String _$coursesNotifierHash() => r'b77dd7af505b48b690c09da58457d5f00b62e19b';
+String _$coursesNotifierHash() => r'd059d78b8a939d1d9e704b6683dd8bf180ed0beb';
 
 /// See also [CoursesNotifier].
 @ProviderFor(CoursesNotifier)
 final coursesNotifierProvider = AutoDisposeNotifierProvider<CoursesNotifier,
-    AsyncValue<List<Course>>>.internal(
+    AsyncValue<List<CourseModel>>>.internal(
   CoursesNotifier.new,
   name: r'coursesNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -299,6 +300,6 @@ final coursesNotifierProvider = AutoDisposeNotifierProvider<CoursesNotifier,
   allTransitiveDependencies: null,
 );
 
-typedef _$CoursesNotifier = AutoDisposeNotifier<AsyncValue<List<Course>>>;
+typedef _$CoursesNotifier = AutoDisposeNotifier<AsyncValue<List<CourseModel>>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

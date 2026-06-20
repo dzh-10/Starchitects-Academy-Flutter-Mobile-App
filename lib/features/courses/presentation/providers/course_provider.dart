@@ -55,7 +55,7 @@ Future<List<CourseModel>> courseCatalog(
   Ref ref,
   CourseFilterParams params,
 ) async {
-  final repository = ref.read(courseRepositoryProvider);
+  final repository = ref.watch(courseRepositoryProvider);
   return repository.getCourses(
     category: params.category,
     search: params.search,
@@ -66,7 +66,7 @@ Future<List<CourseModel>> courseCatalog(
 /// Fetches full course detail by ID
 @riverpod
 Future<CourseModel> courseDetail(Ref ref, String courseId) async {
-  final repository = ref.read(courseRepositoryProvider);
+  final repository = ref.watch(courseRepositoryProvider);
   return repository.getCourseDetail(courseId);
 }
 
@@ -74,7 +74,7 @@ Future<CourseModel> courseDetail(Ref ref, String courseId) async {
 @riverpod
 Future<List<LessonModel>> courseLessons(
     Ref ref, String courseId) async {
-  final repository = ref.read(courseRepositoryProvider);
+  final repository = ref.watch(courseRepositoryProvider);
   return repository.getCourseLessons(courseId);
 }
 
@@ -82,7 +82,7 @@ Future<List<LessonModel>> courseLessons(
 @riverpod
 Future<List<ReviewModel>> courseReviews(
     Ref ref, String courseId) async {
-  final repository = ref.read(courseRepositoryProvider);
+  final repository = ref.watch(courseRepositoryProvider);
   return repository.getCourseReviews(courseId);
 }
 

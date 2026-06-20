@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/glass_card.dart';
 import '../domain/auth_provider.dart';
 import '../domain/auth_state.dart';
 
@@ -41,7 +42,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // إصلاح: استخدام whenOrNull المُعرَّف في AuthState
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
       next.whenOrNull(
         data: (user) {
@@ -59,94 +59,90 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('إنشاء حساب جديد')),
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Center(
-          child: SingleChildScrollView(
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: GlassCard(
             padding: const EdgeInsets.all(24.0),
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: AppColors.kGold, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'الاسم الكامل',
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) => v!.isEmpty ? 'مطلوب' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'البريد الإلكتروني',
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) => v!.isEmpty ? 'مطلوب' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'كلمة المرور',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) =>
-                            v!.length < 6 ? 'قصيرة جداً' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordConfirmController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'تأكيد كلمة المرور',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) =>
-                            v != _passwordController.text
-                                ? 'غير متطابقة'
-                                : null,
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : _register,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.kGold,
-                          ),
-                          child: isLoading
-                              ? const CircularProgressIndicator(
-                                  color: AppColors.kBgPrimary)
-                              : const Text(
-                                  'تسجيل',
-                                  style: TextStyle(
-                                    color: AppColors.kBgPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'الاسم الكامل',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) => v!.isEmpty ? 'مطلوب' : null,
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'البريد الإلكتروني',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'مطلوب';
+                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                      if (!emailRegex.hasMatch(v.trim())) return 'بريد إلكتروني غير صالح';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'كلمة المرور',
+                      prefixIcon: Icon(Icons.lock),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) =>
+                        v!.length < 6 ? 'قصيرة جداً' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordConfirmController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'تأكيد كلمة المرور',
+                      prefixIcon: Icon(Icons.lock),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) =>
+                        v != _passwordController.text
+                            ? 'غير متطابقة'
+                            : null,
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.kGold,
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                              color: AppColors.kBgPrimary)
+                          : const Text(
+                              'تسجيل',
+                              style: TextStyle(
+                                color: AppColors.kBgPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

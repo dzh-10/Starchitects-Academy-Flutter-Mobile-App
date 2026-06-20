@@ -71,7 +71,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
           },
           onWebResourceError: (error) {
             // Handle web resource errors gracefully
-            debugPrint('WebView error: ${error.description}');
+            // Handle web resource errors gracefully
           },
         ),
       )

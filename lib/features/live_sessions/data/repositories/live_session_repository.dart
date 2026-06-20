@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:starchitects_app/core/api/api_client.dart';
@@ -12,7 +12,6 @@ class LiveSessionRepository {
 
   LiveSessionRepository(this._apiClient);
 
-  /// Fetch list of live sessions with optional filters.
   Future<List<SessionModel>> getSessions({
     String? courseId,
     String? status,
@@ -30,21 +29,28 @@ class LiveSessionRepository {
       queryParameters: queryParams,
     );
 
-    final list = response.data as List<dynamic>;
+    final raw = response.data;
+    final list = raw is List
+        ? raw
+        : (raw is Map && raw['data'] is List)
+            ? raw['data'] as List<dynamic>
+            : <dynamic>[];
     return list
-        .map((e) => SessionModel.fromJson(e as Map<String, dynamic>))
+        .whereType<Map<String, dynamic>>()
+        .map((e) => SessionModel.fromJson(e))
         .toList();
   }
 
-  /// Request a LiveKit token to join a session room.
   Future<LiveKitTokenResponse> getSessionToken(String sessionId) async {
     final response = await _apiClient.post(
       ApiEndpoints.sessionToken(sessionId),
     );
 
-    return LiveKitTokenResponse.fromJson(
-      response.data as Map<String, dynamic>,
-    );
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return LiveKitTokenResponse.fromJson(data);
+    }
+    throw Exception('Invalid response format');
   }
 }
 

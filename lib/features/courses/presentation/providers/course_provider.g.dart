@@ -6,7 +6,7 @@ part of 'course_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$courseCatalogHash() => r'da1bd20771050e3a2f563c9d12a04176085776a4';
+String _$courseCatalogHash() => r'30fd27e60de95edec89af54f308040c52ddf9134';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -169,7 +169,7 @@ class _CourseCatalogProviderElement
   CourseFilterParams get params => (origin as CourseCatalogProvider).params;
 }
 
-String _$courseDetailHash() => r'ee85731d3a20b2d3bca32184f60e1e2e79a024d7';
+String _$courseDetailHash() => r'e486fcddd3f19d5aa9c9b2016ffb5d56cbdc8c17';
 
 /// Fetches full course detail by ID
 ///
@@ -309,7 +309,7 @@ class _CourseDetailProviderElement
   String get courseId => (origin as CourseDetailProvider).courseId;
 }
 
-String _$courseLessonsHash() => r'7841d126c0b364e4d892143ff3e9960a79c499cd';
+String _$courseLessonsHash() => r'51185fa75b832a44c20d47b6a55471a1ff66ced3';
 
 /// Fetches all lessons for a course
 ///
@@ -451,7 +451,7 @@ class _CourseLessonsProviderElement
   String get courseId => (origin as CourseLessonsProvider).courseId;
 }
 
-String _$courseReviewsHash() => r'0bbee919f0cc777e101ef6e16fe3f8bb0a1a7409';
+String _$courseReviewsHash() => r'eb40658a4b592ec801ec0c63f860e9adcb392a85';
 
 /// Fetches reviews for a course
 ///

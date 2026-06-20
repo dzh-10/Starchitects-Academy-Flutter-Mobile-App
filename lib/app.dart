@@ -24,6 +24,12 @@ class StarchitectsApp extends ConsumerWidget {
         Locale('ar', 'AE'),
       ],
       locale: const Locale('ar', 'AE'),
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child ?? const SizedBox(),
+        );
+      },
       routerConfig: router,
     );
   }
