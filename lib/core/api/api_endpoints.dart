@@ -18,6 +18,7 @@ class ApiEndpoints {
   static String courseDetail(String id) => '/api/v1/courses/$id';
   static String courseLessons(String id) => '/api/v1/courses/$id/lessons';
   static String enrollCourse(String id) => '/api/v1/courses/$id/enroll';
+  static String courseReviews(String id) => '/api/v1/courses/$id/reviews';
   static const String featuredCourses = '/api/v1/courses/featured';
 
   // ─── Lessons ─────────────────────────────────────────────────────────

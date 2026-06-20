@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:starchitects_app/core/api/api_client.dart';
@@ -45,7 +45,7 @@ class CourseRepository {
   }
 
   Future<CourseModel> getCourseDetail(String id) async {
-    final response = await _apiClient.get('/');
+    final response = await _apiClient.get(ApiEndpoints.courseDetail(id));
     final data = response.data;
     if (data is Map<String, dynamic>) {
       return CourseModel.fromJson(data);
@@ -54,8 +54,7 @@ class CourseRepository {
   }
 
   Future<List<LessonModel>> getCourseLessons(String courseId) async {
-    final response =
-        await _apiClient.get('//lessons');
+    final response = await _apiClient.get(ApiEndpoints.courseLessons(courseId));
     final raw = response.data;
     final list = raw is List
         ? raw
@@ -69,7 +68,7 @@ class CourseRepository {
   }
 
   Future<void> enrollCourse(String courseId) async {
-    await _apiClient.post('//enroll');
+    await _apiClient.post(ApiEndpoints.enrollCourse(courseId));
   }
 
   Future<String> getLessonVideo(String lessonId) async {
@@ -91,8 +90,7 @@ class CourseRepository {
   }
 
   Future<List<ReviewModel>> getCourseReviews(String courseId) async {
-    final response =
-        await _apiClient.get('//reviews');
+    final response = await _apiClient.get(ApiEndpoints.courseReviews(courseId));
     final raw = response.data;
     final list = raw is List
         ? raw
