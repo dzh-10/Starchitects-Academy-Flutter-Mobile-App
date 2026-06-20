@@ -8,10 +8,7 @@ part of 'api_client.dart';
 
 String _$apiClientHash() => r'506e81edfc96b9b480d9f4edee15c5c6265d5107';
 
-/// Dio API client configured with auth interceptor, error mapping,
-/// and debug logging. Provided as a keepAlive Riverpod provider.
-///
-/// Copied from [apiClient].
+/// See also [apiClient].
 @ProviderFor(apiClient)
 final apiClientProvider = Provider<Dio>.internal(
   apiClient,

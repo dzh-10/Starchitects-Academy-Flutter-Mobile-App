@@ -20,11 +20,11 @@ class CoursesNotifier extends _$CoursesNotifier {
 }
 
 @riverpod
-Future<CourseModel> courseDetail(Ref ref, String slug) {
+Future<CourseModel> courseDetail(CourseDetailRef ref, String slug) {
   return ref.watch(courseRepositoryProvider).getCourseDetail(slug);
 }
 
 @riverpod
-Future<List<LessonModel>> courseLessons(Ref ref, String slug) {
+Future<List<LessonModel>> courseLessons(CourseLessonsRef ref, String slug) {
   return ref.watch(courseRepositoryProvider).getCourseLessons(slug);
 }

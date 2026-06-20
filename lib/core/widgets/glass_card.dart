@@ -44,7 +44,7 @@ class GlassCard extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: backgroundColor ??
-                  AppColors.backgroundLight.withValues(alpha: 0.7),
+                  AppColors.surfaceLight.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
                 color: borderColor ?? AppColors.glassBorder,
@@ -90,7 +90,7 @@ class GlassChip extends StatelessWidget {
       blurSigma: 6,
       padding: padding ??
           const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      borderColor: AppColors.glassBorderSubtle,
+      borderColor: AppColors.glassBorder,
       child: child,
     );
   }

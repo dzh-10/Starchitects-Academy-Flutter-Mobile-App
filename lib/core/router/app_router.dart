@@ -8,14 +8,14 @@ import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/courses/presentation/screens/course_catalog_screen.dart';
-import '../../features/courses/presentation/screens/course_detail_screen.dart';
+import '../../features/home/presentation/home_screen.dart';
+import '../../features/courses/presentation/courses_list_screen.dart';
+import '../../features/courses/presentation/course_detail_screen.dart';
 import '../../features/player/presentation/video_player_screen.dart';
 import '../../features/subscription/presentation/plans_screen.dart';
 import '../../features/subscription/presentation/checkout_webview_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/certificates/presentation/screens/certificates_list_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/profile/presentation/certificates_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authNotifier = ValueNotifier<AuthState>(ref.read(authNotifierProvider));
@@ -30,6 +30,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = authNotifier.value;
       final isLoading = authState.isLoading;
+      // إصلاح: استخدام isAuthenticated بدل valueOrNull
       final isLoggedIn = authState.isAuthenticated;
       final location = state.matchedLocation;
 
@@ -72,21 +73,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/courses',
-        builder: (context, state) => const CourseCatalogScreen(),
+        builder: (context, state) => const CoursesListScreen(),
       ),
       GoRoute(
         path: '/courses/:slug',
         builder: (context, state) {
-          final slug = state.pathParameters['slug'];
-          if (slug == null || slug.isEmpty) return const SizedBox.shrink();
+          final slug = state.pathParameters['slug']!;
           return CourseDetailScreen(slug: slug);
         },
       ),
       GoRoute(
         path: '/player/:id',
         builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (id == null || id.isEmpty) return const SizedBox.shrink();
+          final id = state.pathParameters['id']!;
           return VideoPlayerScreen(lessonId: id);
         },
       ),
@@ -107,7 +106,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/certificates',
-        builder: (context, state) => const CertificatesListScreen(),
+        builder: (context, state) => const CertificatesScreen(),
       ),
     ],
   );

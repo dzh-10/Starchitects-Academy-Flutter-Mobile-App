@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/api_constants.dart';
@@ -30,19 +30,19 @@ abstract class ApiService {
   Future<User> getUser();
 
   @GET(ApiConstants.courses)
-  Future<List<Course>> getCourses(
+  Future<List<CourseModel>> getCourses(
     @Query('type') String? type,
     @Query('search') String? search,
   );
 
-  @GET('${ApiConstants.courses}/{slug}')
-  Future<Course> getCourseDetail(@Path('slug') String slug);
+  @GET('\/{slug}')
+  Future<CourseModel> getCourseDetail(@Path('slug') String slug);
 
-  @GET('${ApiConstants.courses}/{id}/lessons')
-  Future<List<Section>> getCourseLessons(@Path('id') int id);
+  @GET('\/{id}/lessons')
+  Future<List<SectionModel>> getCourseLessons(@Path('id') int id);
 
   @GET('lessons/{id}')
-  Future<Lesson> getLessonDetail(@Path('id') int id);
+  Future<LessonModel> getLessonDetail(@Path('id') int id);
 
   @POST('lessons/{id}/progress')
   Future<void> saveLessonProgress(
@@ -51,7 +51,7 @@ abstract class ApiService {
   );
 
   @GET(ApiConstants.userCourses)
-  Future<List<Course>> getUserCourses();
+  Future<List<CourseModel>> getUserCourses();
 
   @GET(ApiConstants.plans)
   Future<dynamic> getSubscriptionPlans();
