@@ -30,19 +30,25 @@ abstract class ApiService {
   Future<User> getUser();
 
   @GET(ApiConstants.courses)
-  Future<List<Course>> getCourses(@Query('type') String? type, @Query('search') String? search);
+  Future<List<Course>> getCourses(
+    @Query('type') String? type,
+    @Query('search') String? search,
+  );
 
-  @GET('\${ApiConstants.courses}/{slug}')
+  @GET('${ApiConstants.courses}/{slug}')
   Future<Course> getCourseDetail(@Path('slug') String slug);
 
-  @GET('\${ApiConstants.courses}/{id}/lessons')
+  @GET('${ApiConstants.courses}/{id}/lessons')
   Future<List<Section>> getCourseLessons(@Path('id') int id);
 
   @GET('lessons/{id}')
   Future<Lesson> getLessonDetail(@Path('id') int id);
 
   @POST('lessons/{id}/progress')
-  Future<void> saveLessonProgress(@Path('id') int id, @Body() Map<String, dynamic> body);
+  Future<void> saveLessonProgress(
+    @Path('id') int id,
+    @Body() Map<String, dynamic> body,
+  );
 
   @GET(ApiConstants.userCourses)
   Future<List<Course>> getUserCourses();

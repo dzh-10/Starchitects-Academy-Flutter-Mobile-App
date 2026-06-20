@@ -1,87 +1,84 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../core/storage/secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
-import '../data/models/user_model.dart';
+import 'auth_state.dart';
+import '../../../core/network/dio_client.dart';
+import '../../../core/storage/secure_storage.dart';
 
-part 'auth_provider.g.dart';
+class AuthNotifier extends StateNotifier<AuthState> {
+  final AuthRepository _repository;
 
-@Riverpod(keepAlive: true)
-class AuthNotifier extends _$AuthNotifier {
-  @override
-  AsyncValue<User?> build() {
-    return const AsyncValue.data(null);
-  }
-
-  Future<void> checkAuth() async {
-    state = const AsyncValue.loading();
-
-    try {
-      final token = await ref.read(secureStorageProvider).getToken();
-
-      if (token != null && token.isNotEmpty) {
-        final user = await ref.read(authRepositoryProvider).getUser();
-        state = AsyncValue.data(user);
-      } else {
-        state = const AsyncValue.data(null);
-      }
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
-    }
-  }
+  AuthNotifier(this._repository) : super(const AuthState());
 
   Future<void> login(String email, String password) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      print('login: request start');
-
-      final response = await ref
-          .read(authRepositoryProvider)
-          .login(email, password);
-      print('login: api success');
-
-      await ref.read(secureStorageProvider).saveToken(response.token);
-      print('login: token saved');
-
-      return response.user;
-    });
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      await _repository.login(email: email, password: password);
+      // Immediately fetch user after token is saved
+      await checkAuth();
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      );
+      rethrow;
+    }
   }
 
   Future<void> register(
     String name,
     String email,
-    String password,
-    String passwordConfirmation,
-  ) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      print('register: request start');
-
-      final response = await ref.read(authRepositoryProvider).register(
-            name,
-            email,
-            password,
-            passwordConfirmation,
-          );
-      print('register: api success');
-
-      await ref.read(secureStorageProvider).saveToken(response.token);
-      print('register: token saved');
-
-      return response.user;
-    });
+    String password, [
+    String? confirmPassword,
+  ]) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+    try {
+      await _repository.register(name: name, email: email, password: password);
+      // Immediately fetch user after token is saved
+      await checkAuth();
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      );
+      rethrow;
+    }
   }
 
   Future<void> logout() async {
-    try {
-      await ref.read(authRepositoryProvider).logout();
-    } catch (_) {
-      // Ignore API logout failure
-    }
+    // Calling backend logout and locally deleting token regardless of success
+    await _repository.logout();
+    state = const AuthState(status: AuthStatus.unauthenticated, userData: null);
+  }
 
-    await ref.read(secureStorageProvider).deleteToken();
-    state = const AsyncValue.data(null);
+  Future<void> checkAuth() async {
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      final hasToken = await _repository.hasToken();
+      if (!hasToken) {
+        state = const AuthState(status: AuthStatus.unauthenticated, userData: null);
+        return;
+      }
+      final userMap = await _repository.getUser();
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        userData: UserData.fromMap(userMap),
+        errorMessage: null,
+      );
+    } catch (_) {
+      // If getUser fails (e.g., 401 Unauthorized), safely mark as unauthenticated
+      state = const AuthState(status: AuthStatus.unauthenticated, userData: null);
+    }
   }
 }
+
+// Ensure the repository receives the interceptor-configured Dio and the SecureStorage
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository(
+    ref.read(dioProvider),
+    ref.read(secureStorageProvider),
+  );
+});
+
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier(ref.read(authRepositoryProvider));
+});

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../domain/auth_provider.dart';
+import '../domain/auth_state.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -18,25 +19,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
+    super.dispose();
+  }
+
   void _register() async {
     if (_formKey.currentState!.validate()) {
       await ref.read(authNotifierProvider.notifier).register(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
-        _passwordConfirmController.text,
-      );
+            _nameController.text,
+            _emailController.text,
+            _passwordController.text,
+            _passwordConfirmController.text,
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authNotifierProvider, (previous, next) {
+    // إصلاح: استخدام whenOrNull المُعرَّف في AuthState
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
       next.whenOrNull(
         data: (user) {
-          if (user != null) {
-            context.go('/home');
-          }
+          if (user != null) context.go('/home');
         },
         error: (error, _) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -49,9 +58,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = ref.watch(authNotifierProvider).isLoading;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('إنشاء حساب جديد'),
-      ),
+      appBar: AppBar(title: const Text('إنشاء حساب جديد')),
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: Center(
@@ -98,7 +105,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           prefixIcon: Icon(Icons.lock),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v!.length < 6 ? 'قصيرة جداً' : null,
+                        validator: (v) =>
+                            v!.length < 6 ? 'قصيرة جداً' : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -109,7 +117,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           prefixIcon: Icon(Icons.lock),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v != _passwordController.text ? 'غير متطابقة' : null,
+                        validator: (v) =>
+                            v != _passwordController.text
+                                ? 'غير متطابقة'
+                                : null,
                       ),
                       const SizedBox(height: 32),
                       SizedBox(
@@ -121,8 +132,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             backgroundColor: AppColors.kGold,
                           ),
                           child: isLoading
-                              ? const CircularProgressIndicator(color: AppColors.kBgPrimary)
-                              : const Text('تسجيل', style: TextStyle(color: AppColors.kBgPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                              ? const CircularProgressIndicator(
+                                  color: AppColors.kBgPrimary)
+                              : const Text(
+                                  'تسجيل',
+                                  style: TextStyle(
+                                    color: AppColors.kBgPrimary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                     ],

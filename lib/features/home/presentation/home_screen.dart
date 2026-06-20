@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../auth/domain/auth_provider.dart';
+import '../../courses/domain/courses_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +18,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(authNotifierProvider);
+    // إصلاح: استخدام valueOrNull?.name بعد تعريف UserData
     final userName = userState.valueOrNull?.name ?? '';
 
     return Scaffold(
@@ -53,7 +55,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               const SizedBox(height: 24),
-              Text('الدورات المميزة', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 18)),
+              Text(
+                'الدورات المميزة',
+                style: Theme.of(context)
+                    .textTheme
+                    .displayMedium
+                    ?.copyWith(fontSize: 18),
+              ),
               const SizedBox(height: 16),
               SizedBox(
                 height: 200,
@@ -67,7 +75,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.kBgCard,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.kGold.withOpacity(0.3)),
+                        border: Border.all(
+                            color: AppColors.kGold.withOpacity(0.3)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,18 +85,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             height: 100,
                             decoration: const BoxDecoration(
                               color: AppColors.kBgCardLight,
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(12)),
                             ),
-                            child: const Center(child: Icon(Icons.image, size: 50, color: AppColors.kTextSecondary)),
+                            child: const Center(
+                              child: Icon(Icons.image,
+                                  size: 50,
+                                  color: AppColors.kTextSecondary),
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('دورة تصميم معماري', style: Theme.of(context).textTheme.bodyLarge),
+                                Text('دورة تصميم معماري',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge),
                                 const SizedBox(height: 4),
-                                const Text('مجاني', style: TextStyle(color: AppColors.kGold, fontWeight: FontWeight.bold)),
+                                const Text('مجاني',
+                                    style: TextStyle(
+                                        color: AppColors.kGold,
+                                        fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -98,22 +118,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('أحدث الدورات', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 18)),
+              Text(
+                'أحدث الدورات',
+                style: Theme.of(context)
+                    .textTheme
+                    .displayMedium
+                    ?.copyWith(fontSize: 18),
+              ),
               const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: Container(width: 60, height: 60, color: AppColors.kBgCardLight, child: const Icon(Icons.image)),
-                      title: const Text('دورة أوتوكاد متقدمة'),
-                      subtitle: const Text('أحمد محمد'),
-                      trailing: const Text('1500 دج', style: TextStyle(color: AppColors.kGold)),
-                      onTap: () => context.push('/courses/autocad-advanced'),
-                    ),
+              ref.watch(coursesNotifierProvider).when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('خطأ: $err')),
+                data: (courses) {
+                  if (courses.isEmpty) return const Text('لا توجد دورات حالياً');
+                  // عرض آخر 3 دورات فقط في الصفحة الرئيسية
+                  final recentCourses = courses.take(3).toList();
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: recentCourses.length,
+                    itemBuilder: (context, index) {
+                      final course = recentCourses[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: Container(
+                              width: 60,
+                              height: 60,
+                              color: AppColors.kBgCardLight,
+                              child: const Icon(Icons.image)),
+                          title: Text(course.title),
+                          subtitle: Text(course.instructorName),
+                          trailing: Text(course.isFree ? 'مجاني' : '${course.price} دج',
+                              style: const TextStyle(color: AppColors.kGold)),
+                          onTap: () => context.push('/courses/${course.slug}'),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -131,10 +172,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (index == 3) context.push('/profile');
           },
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
-            BottomNavigationBarItem(icon: Icon(Icons.play_lesson), label: 'الدورات'),
-            BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'دوراتي'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'الملف'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home), label: 'الرئيسية'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.play_lesson), label: 'الدورات'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.library_books), label: 'دوراتي'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person), label: 'الملف'),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../domain/auth_provider.dart';
+import '../domain/auth_state.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -16,33 +17,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _login() async {
-    if (_formKey.currentState!.validate()) {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+    try {
       await ref.read(authNotifierProvider.notifier).login(
-        _emailController.text,
-        _passwordController.text,
-      );
-    }
+            _emailController.text.trim(),
+            _passwordController.text,
+          );
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authNotifierProvider, (previous, next) {
-      next.whenOrNull(
-        data: (user) {
-          if (user != null) {
-            context.go('/home');
-          }
-        },
-        error: (error, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فشل تسجيل الدخول: $error')),
-          );
-        },
-      );
+    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
+      if (next.status == AuthStatus.authenticated) {
+        context.go('/home');
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     });
 
-    final isLoading = ref.watch(authNotifierProvider).isLoading;
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState.isLoading;
 
     return Scaffold(
       body: Directionality(
@@ -65,9 +73,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       Text(
                         'تسجيل الدخول',
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          color: AppColors.kGold,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge
+                            ?.copyWith(color: AppColors.kGold),
                       ),
                       const SizedBox(height: 32),
                       TextFormField(
@@ -77,7 +86,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           prefixIcon: Icon(Icons.email),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v!.isEmpty ? 'مطلوب' : null,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -88,7 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           prefixIcon: Icon(Icons.lock),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (v) => v!.isEmpty ? 'مطلوب' : null,
+                        validator: (v) =>
+                            (v == null || v.isEmpty) ? 'مطلوب' : null,
                       ),
                       const SizedBox(height: 32),
                       SizedBox(
@@ -100,14 +112,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             backgroundColor: AppColors.kGold,
                           ),
                           child: isLoading
-                              ? const CircularProgressIndicator(color: AppColors.kBgPrimary)
-                              : const Text('تسجيل الدخول', style: TextStyle(color: AppColors.kBgPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                              ? const CircularProgressIndicator(
+                                  color: AppColors.kBgPrimary)
+                              : const Text(
+                                  'تسجيل الدخول',
+                                  style: TextStyle(
+                                    color: AppColors.kBgPrimary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
                         onPressed: () => context.push('/register'),
-                        child: const Text('إنشاء حساب جديد', style: TextStyle(color: AppColors.kTextPrimary)),
+                        child: const Text(
+                          'إنشاء حساب جديد',
+                          style: TextStyle(color: AppColors.kTextPrimary),
+                        ),
                       ),
                     ],
                   ),

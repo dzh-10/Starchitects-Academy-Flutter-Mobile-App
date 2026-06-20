@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/auth/domain/auth_provider.dart';
+import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -16,8 +18,38 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/certificates_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final authNotifier = ValueNotifier<AuthState>(ref.read(authNotifierProvider));
+
+  ref.listen<AuthState>(authNotifierProvider, (_, next) {
+    authNotifier.value = next;
+  });
+
   return GoRouter(
     initialLocation: '/',
+    refreshListenable: authNotifier,
+    redirect: (context, state) {
+      final authState = authNotifier.value;
+      final isLoading = authState.isLoading;
+      // إصلاح: استخدام isAuthenticated بدل valueOrNull
+      final isLoggedIn = authState.isAuthenticated;
+      final location = state.matchedLocation;
+
+      if (isLoading && location == '/') return null;
+
+      const publicRoutes = ['/', '/onboarding', '/login', '/register'];
+      final isPublic = publicRoutes.contains(location);
+
+      if (!isLoggedIn && !isPublic) return '/login';
+
+      if (isLoggedIn &&
+          (location == '/login' ||
+              location == '/register' ||
+              location == '/onboarding')) {
+        return '/home';
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',

@@ -1,30 +1,15 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class ApiConstants {
-  static String get baseUrl {
-    final url = dotenv.env['API_BASE_URL'];
-    if (url == null || url.isEmpty) {
-      throw Exception('API_BASE_URL is missing');
-    }
-    return url.endsWith('/') ? url : '\$url/';
-  }
-  
-  // Auth
-  static const String login = 'login';
-  static const String register = 'register';
-  static const String logout = 'logout';
-  
-  // User
-  static const String user = 'user';
-  static const String notifications = 'notifications';
-  static const String fcmToken = 'fcm/token';
-  
-  // Courses
-  static const String courses = 'courses';
-  static const String userCourses = 'user/courses';
-  static const String certificates = 'user/certificates';
-  
-  // Subscriptions
-  static const String plans = 'subscriptions/plans';
-  static const String checkout = 'subscriptions/checkout';
+  static const String baseUrl = 'https://starchitects.academy';
+
+  static const String login = '/api/v1/login';
+  static const String register = '/api/v1/register';
+  static const String logout = '/api/v1/logout';
+  static const String user = '/api/v1/me';
+
+  static const String courses = '/api/v1/courses';
+  static const String userCourses = '/api/v1/my-courses';
+  static const String plans = '/api/v1/subscription-plans';
+  static const String certificates = '/api/v1/certificates';
+
+  static const String checkout = '/api/v1/checkout';
 }

@@ -33,7 +33,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              'login',
+              '/api/v1/login',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -61,7 +61,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              'register',
+              '/api/v1/register',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -87,7 +87,7 @@ class _ApiService implements ApiService {
     )
         .compose(
           _dio.options,
-          'logout',
+          '/api/v1/logout',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -112,7 +112,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              'user',
+              '/api/v1/me',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -146,7 +146,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              'courses',
+              '/api/v1/courses',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -175,7 +175,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              '${ApiConstants.courses}/${slug}',
+              '/api/v1/courses/${slug}',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -202,7 +202,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              '${ApiConstants.courses}/${id}/lessons',
+              '/api/v1/courses/${id}/lessons',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -286,7 +286,7 @@ class _ApiService implements ApiService {
     )
             .compose(
               _dio.options,
-              'user/courses',
+              '/api/v1/my-courses',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -314,7 +314,7 @@ class _ApiService implements ApiService {
     )
         .compose(
           _dio.options,
-          'subscriptions/plans',
+          '/api/v1/subscription-plans',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -340,7 +340,7 @@ class _ApiService implements ApiService {
     )
         .compose(
           _dio.options,
-          'subscriptions/checkout',
+          '/api/v1/checkout',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -366,7 +366,7 @@ class _ApiService implements ApiService {
     )
         .compose(
           _dio.options,
-          'user/certificates',
+          '/api/v1/certificates',
           queryParameters: queryParameters,
           data: _data,
         )

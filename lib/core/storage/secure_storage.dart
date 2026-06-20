@@ -1,12 +1,21 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final secureStorageProvider = Provider<SecureStorageService>((ref) {
   return SecureStorageService();
 });
 
 class SecureStorageService {
-  final _storage = const FlutterSecureStorage();
+  static final FlutterSecureStorage _storage = kIsWeb
+      ? const FlutterSecureStorage(
+          webOptions: WebOptions(
+            dbName: 'starchitects_db',
+            publicKey: 'starchitects_key',
+          ),
+        )
+      : const FlutterSecureStorage();
+
   static const _tokenKey = 'auth_token';
 
   Future<void> saveToken(String token) async {

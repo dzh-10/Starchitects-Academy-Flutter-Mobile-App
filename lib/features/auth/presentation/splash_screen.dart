@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/constants/app_colors.dart';
 import '../domain/auth_provider.dart';
+import '../domain/auth_state.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -17,13 +18,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(authNotifierProvider.notifier).checkAuth());
+    Future.microtask(() =>
+        ref.read(authNotifierProvider.notifier).checkAuth());
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authNotifierProvider, (previous, next) {
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      // إصلاح: استخدام when المُعرَّف في AuthState
       next.when(
+        loading: () {},
         data: (user) {
           Future.delayed(const Duration(seconds: 2), () {
             if (!mounted) return;
@@ -40,7 +44,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             context.go('/onboarding');
           });
         },
-        loading: () {},
       );
     });
 
@@ -54,13 +57,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               baseColor: AppColors.kGold,
               highlightColor: AppColors.kGoldDark,
               child: const Icon(Icons.school, size: 100),
-            ).animate(onPlay: (controller) => controller.repeat()).scale(duration: 1000.ms),
+            ).animate(onPlay: (c) => c.repeat()).scale(duration: 1000.ms),
             const SizedBox(height: 24),
             Text(
               'Starchitects Academy',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: AppColors.kGold,
-              ),
+                    color: AppColors.kGold,
+                  ),
             ),
           ],
         ),
